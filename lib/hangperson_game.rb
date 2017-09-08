@@ -10,7 +10,14 @@ class HangpersonGame
   
   def initialize(word)
     @word = word
+    @current_status = :play
+    #initialize guesses and wrong_guesses too with empty strings
+    @guesses = ''
+    @wrong_guesses = ''
   end
+  attr_accessor :word
+  attr_accessor :wrong_guesses
+  attr_accessor :guesses
 
   # You can test it by running $ bundle exec irb -I. -r app.rb
   # And then in the irb: irb(main):001:0> HangpersonGame.get_random_word
@@ -23,5 +30,27 @@ class HangpersonGame
       return http.post(uri, "").body
     }
   end
-
+  
+  def check_win_or_lose
+    #check if status is win or lose
+    return @current_status
+  end
+  
+  def word_with_guesses
+    word.gsub(/./)  { |letter| guesses.include?(letter) ? letter : '-' }
+  end
+  
+  def guess(g)
+    if g =~ /[^a-zA-Z]+/ || g.nil? || g.empty?
+      raise ArgumentError
+    end 
+    g.downcase!
+    if !guesses.to_s.include?(g) && word.include?(g)
+      self.guesses = guesses.to_s + g
+    elsif !wrong_guesses.to_s.include?(g) && !word.include?(g)
+      self.wrong_guesses = wrong_guesses.to_s + g
+    else
+      false
+    end
+  end
 end
